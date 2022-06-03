@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  zookeeper:
+    container_name: zookeeper
+    image: wurstmeister/zookeeper
+    ports:
+      - 2181:2181
+  kafka:
+    container_name: kafka
+    image: wurstmeister/kafka
+    ports:
+    - 9092:9092
+    volumes:
+      - ./data/kafka:/var/run/docker. sock
+    environment:
+      - KAFKA ADVERTISED _HOST NAME=kafka
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+  ms1:
+    container_name: ms1
+    build: ./ms1
+    ports:
+      - 8080:8080
+    volumes:
+      - ./ms1:/app
+    environment:
+      - PORT=8080
+      - KKAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC=inbound
+    depends_on:
+      - kafka
+  ms2:
+    container_name: ms2
+    build: ./ms2
+    ports:
+      - 8081:8080
+    volumes:
+      - ./ms2:/app
+    environment:
+      - PORT=8081
+      - KKAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC=inbound
+      - MAIL_USERNAME=
+      - MAIL_PASSWORD=
+      - OAUTH_CLIENTID=
+      - OAUTH_CLIENT_SECRET=
+      - OAUTH_REFRESH_TOKEN=
+    depends_on:
+      - kafka
+    
